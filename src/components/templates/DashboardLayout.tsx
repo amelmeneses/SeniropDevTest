@@ -16,14 +16,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, sear
             {/* Sidebar */}
             <Sidebar />
 
-            {/* Main Content */}
+            {/* Dashboard Overview — fills remaining space after sidebar */}
             <div className="flex flex-1 flex-col overflow-hidden">
                 {/* Top Header */}
-                <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-[#f9f9f9] px-6">
+                <header className="flex h-[88px] items-center justify-between bg-white px-[40px] py-[32px] gap-[40px]">
                     <div className="flex items-center text-sm text-gray-400 font-medium">
                         Dashboard overview
                     </div>
-                    <div className="w-80">
+                    <div className="flex-1">
                         <SearchBar
                             placeholder="Search"
                             value={searchQuery}

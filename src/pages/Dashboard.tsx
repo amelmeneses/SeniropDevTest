@@ -19,7 +19,7 @@ export const Dashboard: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'published' | 'unpublished'>('all');
     const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 10;
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // Drawer state: controls visibility, mode (create/view/edit), and selected article.
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -91,7 +91,7 @@ export const Dashboard: React.FC = () => {
     };
 
     return (
-        <DashboardLayout searchQuery={searchQuery} onSearchChange={(e) => setSearchQuery(e.target.value)}>
+        <DashboardLayout searchQuery={searchQuery} onSearchChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}>
             <div className="space-y-6">
                 {/* Header Section */}
                 <div>
@@ -102,7 +102,7 @@ export const Dashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                     <FilterDropdown
                         value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value as any)}
+                        onChange={(e) => { setFilterStatus(e.target.value as any); setCurrentPage(1); }}
                         options={[
                             { label: 'All', value: 'all' },
                             { label: 'Published', value: 'published' },
@@ -110,14 +110,14 @@ export const Dashboard: React.FC = () => {
                         ]}
                     />
 
-                    <Button onClick={handleCreateClick} className="bg-primary hover:bg-primary-hover text-white text-sm">
+                    <Button onClick={handleCreateClick} className="bg-[#98B6FA] hover:bg-[#7a9ef8] text-white text-sm h-[36px] rounded-[4px]">
                         <Plus className="mr-2 h-4 w-4" />
                         ADD ARTICLE
                     </Button>
                 </div>
 
                 {/* Table Section */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-visible relative">
                     {/* Passing filtered articles to table */}
                     <ArticleTable
                         articles={paginatedArticles}
@@ -133,6 +133,7 @@ export const Dashboard: React.FC = () => {
                         totalPages={totalPages}
                         onPageChange={setCurrentPage}
                         rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(rows) => { setRowsPerPage(rows); setCurrentPage(1); }}
                         totalItems={filteredArticles.length}
                     />
                 </div>

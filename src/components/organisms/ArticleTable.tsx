@@ -23,7 +23,7 @@ export const ArticleTable: React.FC<ArticleTableProps> = ({
     onDelete
 }) => {
     return (
-        <div className="w-full overflow-hidden rounded-lg bg-white p-4">
+        <div className="w-full overflow-visible rounded-lg bg-white p-4">
             <table className="w-full text-left text-sm text-gray-500">
                 <thead className="bg-[#f4f4f4] text-xs font-bold text-gray-700">
                     <tr>

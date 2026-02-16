@@ -16,7 +16,7 @@ interface ArticleDrawerProps {
     onClose: () => void;
     onSave: (article: Omit<Article, 'id'>) => void;
     onUpdate: (id: string, article: Partial<Article>) => void;
-    onEditClick: (article: Article) => void; // Keeping prop in interface but unused in component body for now to avoid breaking parent
+    onEditClick: (article: Article) => void;
 }
 
 // Initial state for form
@@ -35,7 +35,6 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
     onClose,
     onSave,
     onUpdate,
-    // onEditClick, // Removed unused destructuring
 }) => {
     const [formData, setFormData] = useState(INITIAL_FORM_STATE);
 
@@ -52,7 +51,6 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
                 });
             } else {
                 setFormData(INITIAL_FORM_STATE);
-                // Default today's date if creating new? Or empty. Mock shows "00/00/0000" placeholder so empty is fine.
             }
         }
     }, [isOpen, article, mode]);
@@ -77,17 +75,24 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
             onSave(formData);
         } else if (mode === 'edit' && article) {
             onUpdate(article.id, formData);
+        } else if (mode === 'view' && article) {
+            // UPDATE button in view mode toggles publish status
+            onUpdate(article.id, { published: formData.published });
         }
-        onClose(); // Close after save/update
+        onClose();
     };
 
-    const title = mode === 'create' ? 'New article' : mode === 'edit' ? 'Edit article' : (article?.headline || 'Read article');
+    // Format date as DD/MM/YYYY for display in view mode.
+    const formatDate = (dateStr: string) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-GB');
+    };
 
     const Footer = () => {
         if (mode === 'view') {
             return (
-                <div className="flex justify-between w-full border-t border-gray-100 pt-4 mt-6">
-                    <div className="flex-1"></div>
+                <div className="flex justify-end w-full">
                     <Button onClick={handleSubmit} className="bg-accent hover:bg-accent/80 text-white px-8">
                         UPDATE
                     </Button>
@@ -96,7 +101,7 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
         }
 
         return (
-            <div className="flex justify-end w-full border-t border-gray-100 pt-4 mt-6">
+            <div className="flex justify-end w-full">
                 <Button
                     onClick={handleSubmit}
                     disabled={!isFormValid()}
@@ -108,20 +113,63 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
         );
     };
 
+    // View mode: plain text display matching Figma "Read article" mockup.
+    if (mode === 'view') {
+        return (
+            <Drawer isOpen={isOpen} onClose={onClose} title="" footer={<Footer />}>
+                <div className="space-y-8">
+                    {/* Headline as bold heading */}
+                    <h2 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-4">
+                        {formData.headline}
+                    </h2>
+
+                    {/* Author */}
+                    <div className="space-y-1">
+                        <p className="text-sm font-bold text-gray-900">Author</p>
+                        <p className="text-sm text-gray-700">{formData.author}</p>
+                    </div>
+
+                    {/* Body */}
+                    <div className="space-y-1">
+                        <p className="text-sm font-bold text-gray-900">Body</p>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{formData.body}</p>
+                    </div>
+
+                    {/* Publish Date */}
+                    <div className="space-y-1">
+                        <p className="text-sm font-bold text-gray-900">Publish Date</p>
+                        <p className="text-sm text-gray-700">{formatDate(formData.publicationDate)}</p>
+                    </div>
+
+                    {/* Separator + Publish toggle */}
+                    <div className="border-t border-gray-200 pt-6">
+                        <div className="flex items-center gap-4">
+                            <span className="text-sm text-gray-700 font-medium">Publish</span>
+                            <Switch
+                                checked={formData.published}
+                                onCheckedChange={(checked) => handleChange('published', checked)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </Drawer>
+        );
+    }
+
+    // Create / Edit mode: form with inputs.
+    const title = mode === 'create' ? 'New article' : 'Edit article';
+
     return (
         <Drawer isOpen={isOpen} onClose={onClose} title={title} footer={<Footer />}>
+            {/* Drawer title inside the body to match Figma layout */}
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">{title}</h2>
+
             <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-                {/* 
-                   In Figma 'Read article' (Frame 16), the fields look like disabled inputs / gray backgrounds.
-                   I will use the same FormField structure for all modes, but disable inputs in 'view' mode.
-                */}
                 <FormField label="Headline" required>
                     <Input
                         value={formData.headline}
                         onChange={(e) => handleChange('headline', e.target.value)}
                         placeholder="Article headline"
-                        disabled={mode === 'view'}
-                        className={mode === 'view' ? "bg-gray-50 text-gray-500 border-gray-200" : ""}
                     />
                 </FormField>
 
@@ -130,8 +178,6 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
                         value={formData.author}
                         onChange={(e) => handleChange('author', e.target.value)}
                         placeholder="Author name"
-                        disabled={mode === 'view'}
-                        className={mode === 'view' ? "bg-gray-50 text-gray-500 border-gray-200" : ""}
                     />
                 </FormField>
 
@@ -140,8 +186,7 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
                         value={formData.body}
                         onChange={(e) => handleChange('body', e.target.value)}
                         placeholder="Article content..."
-                        className={`min-h-[200px] ${mode === 'view' ? "bg-gray-50 text-gray-500 border-gray-200" : ""}`}
-                        disabled={mode === 'view'}
+                        className="min-h-[200px]"
                     />
                 </FormField>
 
@@ -150,18 +195,14 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
                         type="date"
                         value={formData.publicationDate}
                         onChange={(e) => handleChange('publicationDate', e.target.value)}
-                        disabled={mode === 'view'}
-                        className={mode === 'view' ? "bg-gray-50 text-gray-500 border-gray-200" : ""}
                     />
                 </FormField>
 
-                <div className="flex items-center justify-between pt-2">
-                    <span className="text-gray-700 font-medium">Publish</span>
+                <div className="flex items-center gap-4 pt-2">
+                    <span className="text-sm text-gray-700 font-medium">Publish</span>
                     <Switch
                         checked={formData.published}
                         onCheckedChange={(checked) => handleChange('published', checked)}
-                    // In View mode, screenshot shows toggle is active? "You can only change the switch status". 
-                    // So NOT disabled.
                     />
                 </div>
             </form>
