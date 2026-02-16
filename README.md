@@ -166,16 +166,13 @@ Data is stored in-memory via React state and persisted to `localStorage` as JSON
    npm run preview
    ```
 
-### Deploy to Vercel (Recommended)
+### Vercel (Live)
 
-1. Push your code to the GitHub repository.
-2. Log in to [Vercel](https://vercel.com).
-3. Click **"Add New..."** > **"Project"**.
-4. Import the repository `amelmeneses/SeniropDevTest`.
-5. Set the Framework Preset to **Vite**.
-6. Click **Deploy**.
+The application is already deployed on Vercel and available at:
 
-Vercel will automatically detect the Vite configuration and deploy the application. Subsequent pushes to the main branch will trigger automatic redeployments.
+**https://senirop-dev-test.vercel.app**
+
+Every push to the main branch triggers an automatic redeployment.
 
 ### Deploy to Any Static Host
 
@@ -189,39 +186,26 @@ Since this is a client-side SPA with no backend, the `dist/` folder can be serve
 
 ## Testing
 
-### Current Status
+The project uses **Vitest** + **React Testing Library** + **jsdom** for testing.
 
-No test framework is configured yet in this project. The architecture is designed to support testing at multiple levels:
-
-### Recommended Test Setup
-
-To add testing, install Vitest (recommended for Vite projects):
+### Running Tests
 
 ```bash
-npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom
+npm run test              # Watch mode
+npm run test -- --run     # Single run
+npm run test:coverage     # Coverage report
 ```
 
-Add a test script to `package.json`:
+### Test Suite Summary
 
-```json
-{
-  "scripts": {
-    "test": "vitest",
-    "test:run": "vitest run"
-  }
-}
-```
+**4 test files — 21 tests — all passing**
 
-### What to Test
-
-- **Unit tests**: Individual atoms and molecules (Button variants, Input behavior, FormField validation display).
-- **Integration tests**: ArticleContext CRUD operations, useLocalStorage hook persistence.
-- **Component tests**: Dashboard page interactions (search filtering, pagination, drawer open/close).
-- **E2E tests** (optional): Use Playwright or Cypress for full user flow testing (create article, edit, delete, toggle publish).
-
-### Test Environment
-
-No special environment setup is required beyond the dev dependencies. Tests run against jsdom (simulated browser environment).
+| File | Description | Tests |
+|------|-------------|-------|
+| `utils.test.ts` | `cn()` merging, Tailwind conflicts, edge cases | 4 |
+| `useLocalStorage.test.ts` | Initial values, persistence, function updates, parse errors | 5 |
+| `ArticleContext.test.tsx` | Add/update/delete/togglePublish, provider guard | 5 |
+| `ArticleDrawer.test.tsx` | Form validation, disabled save, edit pre-fill | 7 |
 
 ---
 
