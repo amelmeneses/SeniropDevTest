@@ -28,6 +28,15 @@ const INITIAL_FORM_STATE = {
     published: false,
 };
 
+type TouchedFields = Record<'headline' | 'author' | 'body' | 'publicationDate', boolean>;
+
+const INITIAL_TOUCHED: TouchedFields = {
+    headline: false,
+    author: false,
+    body: false,
+    publicationDate: false,
+};
+
 export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
     isOpen,
     mode,
@@ -37,10 +46,12 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
     onUpdate,
 }) => {
     const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+    const [touched, setTouched] = useState<TouchedFields>(INITIAL_TOUCHED);
 
     // Sync form data when the drawer opens: populate from article or reset.
     useEffect(() => {
         if (isOpen) {
+            setTouched(INITIAL_TOUCHED);
             if (article) {
                 setFormData({
                     headline: article.headline,
@@ -59,25 +70,45 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    // All required fields must be non-empty to enable the save button.
-    const isFormValid = () => {
-        return (
-            formData.headline.trim() !== '' &&
-            formData.author.trim() !== '' &&
-            formData.body.trim() !== '' &&
-            formData.publicationDate.trim() !== ''
-        );
+    const handleBlur = (field: keyof TouchedFields) => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
     };
+
+    const getErrors = (): Partial<Record<keyof TouchedFields, string>> => {
+        const errors: Partial<Record<keyof TouchedFields, string>> = {};
+        if (formData.headline.trim() === '') errors.headline = 'Headline is required';
+        if (formData.author.trim() === '') {
+            errors.author = 'Author is required';
+        } else if (/\d/.test(formData.author)) {
+            errors.author = 'Author must not contain numbers';
+        }
+        if (formData.body.trim() === '') errors.body = 'Body is required';
+        if (formData.publicationDate.trim() === '') {
+            errors.publicationDate = 'Publication date is required';
+        } else if (isNaN(new Date(formData.publicationDate).getTime())) {
+            errors.publicationDate = 'Invalid date';
+        }
+        return errors;
+    };
+
+    const errors = getErrors();
 
     // Dispatch create or update depending on the current mode, then close.
     const handleSubmit = () => {
+        if (mode === 'view' && article) {
+            onUpdate(article.id, { published: formData.published });
+            onClose();
+            return;
+        }
+
+        setTouched({ headline: true, author: true, body: true, publicationDate: true });
+
+        if (Object.keys(getErrors()).length > 0) return;
+
         if (mode === 'create') {
             onSave(formData);
         } else if (mode === 'edit' && article) {
             onUpdate(article.id, formData);
-        } else if (mode === 'view' && article) {
-            // UPDATE button in view mode toggles publish status
-            onUpdate(article.id, { published: formData.published });
         }
         onClose();
     };
@@ -104,7 +135,7 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
             <div className="flex justify-end w-full">
                 <Button
                     onClick={handleSubmit}
-                    disabled={!isFormValid()}
+                    disabled={Object.keys(errors).length > 0}
                     className={mode === 'create' ? 'bg-gray-300 enabled:bg-accent text-white px-8' : 'bg-accent hover:bg-accent/80 text-white px-8'}
                 >
                     {mode === 'create' ? 'SAVE' : 'UPDATE'}
@@ -165,36 +196,52 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
             <h2 className="text-xl font-semibold text-gray-900 mb-6">{title}</h2>
 
             <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-                <FormField label="Headline" required>
+                <FormField label="Headline" htmlFor="article-headline" required error={touched.headline ? errors.headline : undefined}>
                     <Input
+                        id="article-headline"
+                        name="headline"
                         value={formData.headline}
                         onChange={(e) => handleChange('headline', e.target.value)}
+                        onBlur={() => handleBlur('headline')}
                         placeholder="Article headline"
+                        error={touched.headline && !!errors.headline}
                     />
                 </FormField>
 
-                <FormField label="Author" required>
+                <FormField label="Author" htmlFor="article-author" required error={touched.author ? errors.author : undefined}>
                     <Input
+                        id="article-author"
+                        name="author"
                         value={formData.author}
                         onChange={(e) => handleChange('author', e.target.value)}
+                        onBlur={() => handleBlur('author')}
                         placeholder="Author name"
+                        error={touched.author && !!errors.author}
                     />
                 </FormField>
 
-                <FormField label="Body" required>
+                <FormField label="Body" htmlFor="article-body" required error={touched.body ? errors.body : undefined}>
                     <Textarea
+                        id="article-body"
+                        name="body"
                         value={formData.body}
                         onChange={(e) => handleChange('body', e.target.value)}
+                        onBlur={() => handleBlur('body')}
                         placeholder="Article content..."
                         className="min-h-[200px]"
+                        error={touched.body && !!errors.body}
                     />
                 </FormField>
 
-                <FormField label="Publish Date" required>
+                <FormField label="Publish Date" htmlFor="article-date" required error={touched.publicationDate ? errors.publicationDate : undefined}>
                     <Input
+                        id="article-date"
+                        name="publicationDate"
                         type="date"
                         value={formData.publicationDate}
                         onChange={(e) => handleChange('publicationDate', e.target.value)}
+                        onBlur={() => handleBlur('publicationDate')}
+                        error={touched.publicationDate && !!errors.publicationDate}
                     />
                 </FormField>
 

@@ -14,6 +14,9 @@ export const FilterDropdown = React.forwardRef<HTMLSelectElement, FilterDropdown
             <div className="relative inline-block w-full sm:w-48">
                 <select
                     ref={ref}
+                    id="filter-status"
+                    name="filter-status"
+                    aria-label="Filter by status"
                     className={cn(
                         'w-full appearance-none rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary',
                         className

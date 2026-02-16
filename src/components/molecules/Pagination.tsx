@@ -31,6 +31,9 @@ export const Pagination: React.FC<PaginationProps> = ({
                 <span className="sm:hidden">Rows:</span>
                 <span className="hidden sm:inline">Rows per page:</span>
                 <select
+                    id="rows-per-page"
+                    name="rows-per-page"
+                    aria-label="Rows per page"
                     value={rowsPerPage}
                     onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
                     className="appearance-none bg-transparent pr-4 font-medium cursor-pointer focus:outline-none"
