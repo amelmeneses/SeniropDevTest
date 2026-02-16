@@ -19,7 +19,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     onClose,
     children,
     footer,
-    width = "w-[548px]" // Default width matching Figma
+    width = "w-full sm:w-[548px]"
 }) => {
     // Prevent background scrolling while the drawer is open.
     useEffect(() => {
@@ -48,7 +48,7 @@ export const Drawer: React.FC<DrawerProps> = ({
             <div className={cn("relative z-10 flex h-full flex-col bg-white rounded-[4px] border border-[#E5E5E5] shadow-xl transition-transform duration-300 ease-in-out transform translate-x-0", width)}>
 
                 {/* Close button — top-right, matching Figma layout */}
-                <div className="flex items-center justify-end px-[32px] pt-[24px]">
+                <div className="flex items-center justify-end px-4 sm:px-[32px] pt-[24px]">
                     <button
                         onClick={onClose}
                         className="text-blue-400 hover:text-blue-500 flex items-center text-sm font-medium"
@@ -59,13 +59,13 @@ export const Drawer: React.FC<DrawerProps> = ({
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto px-[32px] py-[24px]">
+                <div className="flex-1 overflow-y-auto px-4 sm:px-[32px] py-4 sm:py-[24px]">
                     {children}
                 </div>
 
                 {/* Footer */}
                 {footer && (
-                    <div className="px-[32px] pb-[24px]">
+                    <div className="px-4 sm:px-[32px] pb-4 sm:pb-[24px]">
                         {footer}
                     </div>
                 )}

@@ -26,9 +26,10 @@ export const Pagination: React.FC<PaginationProps> = ({
     const end = Math.min(currentPage * rowsPerPage, totalItems);
 
     return (
-        <div className="flex items-center justify-end space-x-4 border-t border-gray-100 px-4 py-3 text-sm text-gray-500 bg-white">
+        <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 border-t border-gray-100 px-4 py-3 text-sm text-gray-500 bg-white">
             <span className="flex items-center gap-1">
-                Rows per page:
+                <span className="sm:hidden">Rows:</span>
+                <span className="hidden sm:inline">Rows per page:</span>
                 <select
                     value={rowsPerPage}
                     onChange={(e) => onRowsPerPageChange(Number(e.target.value))}

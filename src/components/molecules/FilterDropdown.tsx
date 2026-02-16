@@ -11,7 +11,7 @@ interface FilterDropdownProps extends React.SelectHTMLAttributes<HTMLSelectEleme
 export const FilterDropdown = React.forwardRef<HTMLSelectElement, FilterDropdownProps>(
     ({ className, options, ...props }, ref) => {
         return (
-            <div className="relative inline-block w-48">
+            <div className="relative inline-block w-full sm:w-48">
                 <select
                     ref={ref}
                     className={cn(
