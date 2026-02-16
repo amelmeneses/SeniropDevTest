@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Design tokens: custom color palette and font exposed as Tailwind theme extensions.
+   These can be used as utility classes, e.g. bg-primary, text-accent, font-roboto, etc. */
+@theme {
+  --font-roboto: "Roboto", sans-serif;
+  --color-primary: #2B2D42;
+  --color-primary-hover: #1a1b2e;
+  --color-sidebar: #2B2D42;
+  --color-sidebar-hover: #3a3d54;
+  --color-sidebar-active: #3a3d54;
+  --color-logout-bg: #3B82F6;
+  --color-logout-hover: #2563EB;
+  --color-accent: #818cf8;
+}
+
+/* Global base typography and font smoothing */
+:root {
+  font-family: var(--font-roboto);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.43;
+  letter-spacing: 0.17px;
+  color: rgba(0, 0, 0, 0.87);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
