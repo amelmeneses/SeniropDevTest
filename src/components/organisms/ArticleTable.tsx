@@ -7,8 +7,9 @@ interface ArticleTableProps {
     articles: Article[];
     onTogglePublish: (id: string, currentStatus: boolean) => void;
     onView: (id: string) => void;
-    onEdit: (id: string) => void; // Keeping generic ID passed, though menu handles it
+    onEdit: (id: string) => void;
     onDelete: (id: string) => void;
+    onGoToLiveSite: (id: string) => void;
 }
 
 // Renders the articles list as a styled HTML table.
@@ -20,7 +21,8 @@ export const ArticleTable: React.FC<ArticleTableProps> = ({
     onTogglePublish,
     onView,
     onEdit,
-    onDelete
+    onDelete,
+    onGoToLiveSite
 }) => {
     return (
         <div className="w-full overflow-visible rounded-lg bg-white p-4">
@@ -68,6 +70,7 @@ export const ArticleTable: React.FC<ArticleTableProps> = ({
                                         onView={() => onView(article.id)}
                                         onEdit={() => onEdit(article.id)}
                                         onDelete={() => onDelete(article.id)}
+                                        onGoToLiveSite={() => onGoToLiveSite(article.id)}
                                     />
                                 </td>
                             </tr>

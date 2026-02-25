@@ -1,16 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MoreHorizontal, Edit2, Eye, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Edit2, Eye, Trash2, ExternalLink } from 'lucide-react';
 import { Button } from '../atoms/Button';
 
 interface TableRowActionMenuProps {
     onView: () => void;
     onEdit: () => void;
     onDelete: () => void;
+    onGoToLiveSite: () => void;
 }
 
 // Dropdown action menu for table rows with View, Edit, and Delete options.
 // Closes automatically when clicking outside thanks to a mousedown listener.
-export const TableRowActionMenu: React.FC<TableRowActionMenuProps> = ({ onView, onEdit, onDelete }) => {
+export const TableRowActionMenu: React.FC<TableRowActionMenuProps> = ({ onView, onEdit, onDelete, onGoToLiveSite }) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +56,16 @@ export const TableRowActionMenu: React.FC<TableRowActionMenuProps> = ({ onView, 
                         >
                             <Eye className="mr-3 h-4 w-4 text-gray-400 group-hover:text-gray-500" />
                             View
+                        </button>
+                        <button
+                            onClick={() => {
+                                onGoToLiveSite();
+                                setIsOpen(false);
+                            }}
+                            className="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                            <ExternalLink className="mr-3 h-4 w-4 text-gray-400 group-hover:text-gray-500" />
+                            Go to live site
                         </button>
                         <button
                             onClick={() => {

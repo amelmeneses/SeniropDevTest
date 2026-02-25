@@ -13,13 +13,14 @@ import { Plus } from 'lucide-react';
 // Owns all local UI state (search, filter, pagination, drawer)
 // and connects to ArticleContext for data operations.
 export const Dashboard: React.FC = () => {
-    const { articles, addArticle, updateArticle, deleteArticle, togglePublish } = useArticles();
+    const { articles, addArticle, updateArticle, deleteArticle, gotoArticle, togglePublish } = useArticles();
 
     // UI state: search query, publish-status filter, and pagination.
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'published' | 'unpublished'>('all');
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    
 
     // Drawer state: controls visibility, mode (create/view/edit), and selected article.
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -80,6 +81,11 @@ export const Dashboard: React.FC = () => {
         setSelectedArticle(article);
     }
 
+    // Navigation handler (mock implementation).
+    const handleGotoArticle = (id: string) => {
+        gotoArticle(id);
+    };      
+
     // Confirm before deleting; also closes the drawer if the deleted article is open.
     const handleDeleteClick = (id: string) => {
         if (window.confirm('Are you sure you want to delete this article?')) {
@@ -125,6 +131,7 @@ export const Dashboard: React.FC = () => {
                         onView={handleViewClick}
                         onEdit={handleEditClick}
                         onDelete={handleDeleteClick}
+                        onGoToLiveSite={handleGotoArticle}
                     />
 
                     {/* Pagination */}
@@ -151,4 +158,6 @@ export const Dashboard: React.FC = () => {
             </div>
         </DashboardLayout>
     );
+
+    //
 };

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import type { Article } from '../../types/article';
+import type { Article, ImageFile } from '../../types/article';
 import { Drawer } from './Drawer';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Textarea } from '../atoms/Textarea';
 import { Switch } from '../atoms/Switch';
 import { FormField } from '../molecules/FormField';
+import { ImageUploader } from '../atoms/Image';
 
 // Props control the drawer's visibility and behavior.
 // mode determines whether the form is for creating, viewing, or editing an article.
@@ -20,21 +21,30 @@ interface ArticleDrawerProps {
 }
 
 // Initial state for form
-const INITIAL_FORM_STATE = {
+const INITIAL_FORM_STATE: {
+    headline: string;
+    author: string;
+    body: string;
+    publicationDate: string;
+    published: boolean;
+    image: ImageFile[];
+} = {
     headline: '',
     author: '',
     body: '',
     publicationDate: '',
     published: false,
+    image: [],
 };
 
-type TouchedFields = Record<'headline' | 'author' | 'body' | 'publicationDate', boolean>;
+type TouchedFields = Record<'headline' | 'author' | 'body' | 'publicationDate' | 'image', boolean>;
 
 const INITIAL_TOUCHED: TouchedFields = {
     headline: false,
     author: false,
     body: false,
     publicationDate: false,
+    image: false,
 };
 
 export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
@@ -59,6 +69,7 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
                     body: article.body,
                     publicationDate: article.publicationDate,
                     published: article.published,
+                    image: article.image ?? [],
                 });
             } else {
                 setFormData(INITIAL_FORM_STATE);
@@ -66,7 +77,7 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
         }
     }, [isOpen, article, mode]);
 
-    const handleChange = (field: keyof typeof formData, value: string | boolean) => {
+    const handleChange = (field: keyof typeof formData, value: string | boolean | ImageFile[]) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -88,6 +99,7 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
         } else if (isNaN(new Date(formData.publicationDate).getTime())) {
             errors.publicationDate = 'Invalid date';
         }
+        if (formData.image.length === 0) errors.image = 'Image is required';
         return errors;
     };
 
@@ -101,7 +113,7 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
             return;
         }
 
-        setTouched({ headline: true, author: true, body: true, publicationDate: true });
+        setTouched({ headline: true, author: true, body: true, publicationDate: true, image: true });
 
         if (Object.keys(getErrors()).length > 0) return;
 
@@ -165,6 +177,16 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
                         <p className="text-sm font-bold text-gray-900">Body</p>
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">{formData.body}</p>
                     </div>
+
+                    {/* Images */}
+                    {formData.image.length > 0 && (
+                        <div className="space-y-2">
+                            <p className="text-sm font-bold text-gray-900">Images</p>
+                            {formData.image.map((img, i) => (
+                                <img key={i} src={img.dataUrl} alt={img.name} className="w-full max-h-64 object-cover rounded-lg" />
+                            ))}
+                        </div>
+                    )}
 
                     {/* Publish Date */}
                     <div className="space-y-1">
@@ -242,6 +264,17 @@ export const ArticleDrawer: React.FC<ArticleDrawerProps> = ({
                         onChange={(e) => handleChange('publicationDate', e.target.value)}
                         onBlur={() => handleBlur('publicationDate')}
                         error={touched.publicationDate && !!errors.publicationDate}
+                    />
+                </FormField>
+
+                <FormField label="Image" htmlFor="article-image" required error={touched.image ? errors.image : undefined}>
+                    <ImageUploader
+                        value={formData.image}
+                        onChange={(image) => {
+                            handleChange('image', image);
+                            setTouched((prev) => ({ ...prev, image: true }));
+                        }}
+                        error={touched.image && !!errors.image}
                     />
                 </FormField>
 
